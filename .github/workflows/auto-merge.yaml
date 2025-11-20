@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/github-script@v8
         id: create-pull-requests
+        name: Create pull requests
         with:
           script: |
             const branches = await github.paginate(
@@ -40,6 +41,8 @@ jobs:
             return prNumbers;
       - uses: actions/github-script@v8
         id: merge-pull-requests
+        name: Merge pull requests
+        if: inputs.auto_merge
         with:
           script: |
             const prNumbers = ${{ steps.create-pull-requests.outputs.result }}
