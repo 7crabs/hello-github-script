@@ -26,6 +26,7 @@ jobs:
               github.rest.pulls.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
+                title: `Merge branch 'main' into ${branch.name}`,
                 head: 'main',
                 base: branch.name,
               });
