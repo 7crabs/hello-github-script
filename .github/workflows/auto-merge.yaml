@@ -1,3 +1,4 @@
+name: Auto merge main into release branches
 on:
   push:
     branches:
@@ -42,7 +43,7 @@ jobs:
       - uses: actions/github-script@v8
         id: merge-pull-requests
         name: Merge pull requests
-        if: ${{ inputs.auto_merge == '' || inputs.auto_merge }}
+        if: ${{ inputs.auto_merge == 'true' }}
         with:
           script: |
             const prNumbers = ${{ steps.create-pull-requests.outputs.result }}
