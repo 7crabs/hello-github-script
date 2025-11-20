@@ -31,7 +31,7 @@ jobs:
                 base: branch.name,
               })).data;
               console.log(pr);
-              while (pr.mergeable_state === 'unknown') {
+              while (pr.mergeable_state === 'unknown' || pr.mergeable_state === 'unstable') {
                 console.log('Waiting for mergeable state to be known');
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 pr = (await github.rest.pulls.get({
