@@ -40,11 +40,9 @@ jobs:
             return prNumbers;
       - uses: actions/github-script@v8
         id: merge-pull-requests
-        env:
-          PR_NUMBERS: ${{ steps.create-pull-requests.outputs.result }}
         with:
           script: |
-            const prNumbers = JSON.parse(process.env.PR_NUMBERS || '[]');
+            const prNumbers = ${{ steps.create-pull-requests.outputs.result }}
             for (const prNumber of prNumbers) {
               let pr = (await github.rest.pulls.get({
                 owner: context.repo.owner,
