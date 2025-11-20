@@ -1,0 +1,25 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            console.log(context.repo);
+            console.log(context.repo.owner);
+            console.log(context.repo.repo);
+            const branches = await github.paginate(
+              github.rest.repos.listBranches,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                }
+            );
+            const releaseBranches = branches.filter(branch => branch.name.startsWith('release'));
+            console.log(releaseBranches);
