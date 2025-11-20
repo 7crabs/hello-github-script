@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  comment:
+  create-and-merge-prs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v8
