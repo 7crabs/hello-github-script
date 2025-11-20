@@ -22,4 +22,12 @@ jobs:
                 }
             );
             const releaseBranches = branches.filter(branch => branch.name.startsWith('release'));
+            for (const branch of releaseBranches) {
+              github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: 'main',
+                base: branch.name,
+              });
+            }
             console.log(releaseBranches);
