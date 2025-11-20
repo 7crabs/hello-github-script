@@ -47,6 +47,7 @@ jobs:
         if: ${{ inputs.auto_merge != 'false' }}
         with:
           script: |
+            console.log("${{ inputs.auto_merge }}");
             const prNumbers = ${{ steps.create-pull-requests.outputs.result }}
             for (const prNumber of prNumbers) {
               let pr = (
