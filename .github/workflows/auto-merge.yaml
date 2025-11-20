@@ -42,7 +42,7 @@ jobs:
       - uses: actions/github-script@v8
         id: merge-pull-requests
         name: Merge pull requests
-        if: ${{ inputs.auto_merge != false }}
+        if: ${{ inputs.auto_merge == '' || inputs.auto_merge }}
         with:
           script: |
             const prNumbers = ${{ steps.create-pull-requests.outputs.result }}
