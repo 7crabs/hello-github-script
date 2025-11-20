@@ -33,12 +33,13 @@ jobs:
               console.log(pr);
               while (pr.mergeable_state === 'unknown') {
                 console.log('Waiting for mergeable state to be known');
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 10000));
                 pr = await github.rest.pulls.get({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
                   pull_number: pr.number,
                 });
+                console.log(pr);
               }
               if (pr.mergeable_state === 'clean') {
                 await github.rest.pulls.merge({
