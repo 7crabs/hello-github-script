@@ -36,24 +36,6 @@ jobs:
                 base: branch.name,
               })).data;
               prNumbers.push(pr.number);
-              # console.log(pr);
-              # while (pr.mergeable === null) {
-              #   console.log('Waiting for mergeable state to be known');
-              #   await new Promise(resolve => setTimeout(resolve, 10000));
-              #   pr = (await github.rest.pulls.get({
-              #     owner: context.repo.owner,
-              #     repo: context.repo.repo,
-              #     pull_number: pr.number,
-              #   })).data;
-              #   # console.log(pr);
-              # }
-              # if (pr.mergeable) {
-              #   await github.rest.pulls.merge({
-              #     owner: context.repo.owner,
-              #     repo: context.repo.repo,
-              #     pull_number: pr.number,
-              #   });
-              # }
             }
             return prNumbers;
       - uses: actions/github-script@v8
