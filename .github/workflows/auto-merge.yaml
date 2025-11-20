@@ -3,17 +3,21 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      auto_merge:
+        description: "Automatically merge PRs if mergeable"
+        required: false
+        type: boolean
+        default: true
 
 jobs:
   create-and-merge-prs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v8
+        id: create-pull-requests
         with:
           script: |
-            console.log(context.repo);
-            console.log(context.repo.owner);
-            console.log(context.repo.repo);
             const branches = await github.paginate(
               github.rest.repos.listBranches,
                 {
@@ -22,6 +26,7 @@ jobs:
                 }
             );
             const releaseBranches = branches.filter(branch => branch.name.startsWith('release'));
+            const prNumbers = [];
             for (const branch of releaseBranches) {
               let pr = (await github.rest.pulls.create({
                 owner: context.repo.owner,
@@ -30,23 +35,52 @@ jobs:
                 head: 'main',
                 base: branch.name,
               })).data;
-              console.log(pr);
+              prNumbers.push(pr.number);
+              # console.log(pr);
+              # while (pr.mergeable === null) {
+              #   console.log('Waiting for mergeable state to be known');
+              #   await new Promise(resolve => setTimeout(resolve, 10000));
+              #   pr = (await github.rest.pulls.get({
+              #     owner: context.repo.owner,
+              #     repo: context.repo.repo,
+              #     pull_number: pr.number,
+              #   })).data;
+              #   # console.log(pr);
+              # }
+              # if (pr.mergeable) {
+              #   await github.rest.pulls.merge({
+              #     owner: context.repo.owner,
+              #     repo: context.repo.repo,
+              #     pull_number: pr.number,
+              #   });
+              # }
+            }
+            return prNumbers;
+      - uses: actions/github-script@v8
+        id: merge-pull-requests
+        with:
+          script: |
+            const prNumbers = steps.create-pull-requests.outputs.prNumbers;
+            for (const prNumber of prNumbers) {
+              let pr = (await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prNumber,
+              })).data;
               while (pr.mergeable === null) {
                 console.log('Waiting for mergeable state to be known');
                 await new Promise(resolve => setTimeout(resolve, 10000));
                 pr = (await github.rest.pulls.get({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: pr.number,
+                  pull_number: prNumber,
                 })).data;
-                console.log(pr);
               }
               if (pr.mergeable) {
                 await github.rest.pulls.merge({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
-                  pull_number: pr.number,
+                  pull_number: prNumber,
                 });
               }
             }
-            console.log(releaseBranches);
