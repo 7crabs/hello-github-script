@@ -16,29 +16,35 @@ jobs:
             console.log(context.repo.repo);
             const branches = await github.paginate(
               github.rest.repos.listBranches,
-                {
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                }
+              {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              }
             );
             const releaseBranches = branches.filter(branch => branch.name.startsWith('release'));
             for (const branch of releaseBranches) {
-              let pr = await github.rest.pulls.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                title: `Merge branch 'main' into ${branch.name}`,
-                head: 'main',
-                base: branch.name,
-              }).data;
+              let pr = await github.paginate(
+                github.rest.pulls.create, 
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `Merge branch 'main' into ${branch.name}`,
+                  head: 'main',
+                  base: branch.name,
+                }
+              );
               console.log(pr);
               while (pr.mergeable_state === 'unknown') {
                 console.log('Waiting for mergeable state to be known');
                 await new Promise(resolve => setTimeout(resolve, 10000));
-                pr = await github.rest.pulls.get({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: pr.number,
-                }).data;
+                pr = await github.paginate(
+                  github.rest.pulls.get,
+                  {
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: pr.number,
+                  }
+                );
                 console.log(pr);
               }
               if (pr.mergeable_state === 'clean') {
