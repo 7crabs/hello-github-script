@@ -44,7 +44,7 @@ jobs:
       - uses: actions/github-script@v8
         id: merge-pull-requests
         name: Merge pull requests
-        if: ${{ inputs.auto_merge == '' || inputs.auto_merge }}
+        if: ${{ inputs.auto_merge == '' || inputs.auto_merge == 'true' }}
         with:
           script: |
             console.log("${{ inputs.auto_merge }}");
